@@ -13,6 +13,9 @@ function validate(word: string): void {
   }
   if (word.trim().length === 0) throw new Error("word must not be only whitespace");
   if (/\s/.test(word)) throw new Error("entry must be exactly one word");
+  if (!/^[A-Za-z]+$/.test(word)) {
+    throw new Error("word must contain letters only, no digits or punctuation");
+  }
 }
 
 function main(): void {
@@ -23,7 +26,9 @@ function main(): void {
   writeFileSync(outPath, WORD, "utf8");
   const back = readFileSync(outPath, "utf8");
   if (back !== WORD) throw new Error("round-trip mismatch");
-  console.log(`wrote ${WORD.length} chars: ${WORD}`);
+  const bytes = Buffer.byteLength(back, "utf8");
+  if (bytes !== back.length) throw new Error("word must be plain ASCII letters");
+  console.log(`wrote ${WORD.length} chars (${bytes} bytes): ${WORD}`);
 }
 
 main();
